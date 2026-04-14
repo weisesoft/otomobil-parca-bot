@@ -4,14 +4,20 @@ from flask import Flask, request, render_template_string
 
 # 1) Google Sheet bağlantısı
 def connect_sheet():
+    import json, os
     scope = [
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/drive"
     ]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("service_key.json", scope)
+
+    # SERVICE_KEY environment variable'dan JSON'u oku
+    service_key = json.loads(os.environ["SERVICE_KEY"])
+
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(service_key, scope)
     client = gspread.authorize(creds)
-    sheet = client.open("otomobil_parca_listesi").sheet1  # Sheet adın farklıysa değiştir
+    sheet = client.open("otomobil_parca_listesi").sheet1
     return sheet
+
 
 # 2) Filtreleme fonksiyonu
 def get_parts(brand=None, model=None, category=None):
